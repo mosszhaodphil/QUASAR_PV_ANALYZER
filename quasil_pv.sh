@@ -137,6 +137,13 @@ imcp $start_dir/$mask $out_dir/$mask
 imcp $start_dir/$pvgm $out_dir/$pvgm
 imcp $start_dir/$pvwm $out_dir/$pvwm
 
+it_file=$out_dir/$it_file
+itc_file=$out_dir/$it_file
+iaif_file=$out_dir/$iaif_file
+mask=$out_dir/$mask
+pvgm=$out_dir/$pvgm
+pvwm=$out_dir/$pvwm
+
 # Copy option files to output directory
 cp $start_dir/options_fabber.txt $out_dir/options_fabber.txt
 cp $start_dir/options_basil.txt $out_dir/options_basil.txt
@@ -146,6 +153,8 @@ gm_mask="gm_mask"
 wm_mask="wm_mask"
 fslmaths $out_dir/$pvgm -bin $out_dir/$gm_mask
 fslmaths $out_dir/$pvwm -bin $out_dir/$wm_mask
+gm_mask=$out_dir/$gm_mask
+wm_mask=$out_dir/$wm_mask
 
 # Make six output directories
 mkdir $mbased_fabber_uncorr
@@ -196,7 +205,7 @@ echo "Estimate CBF without PV correction..."
 
 cd $mbased_fabber_uncorr
 
-fabber --data=$out_dir/$itc_file --data-order=singlefile --mask=$out_dir/$mask --output=full -@ $out_dir/options_fabber.txt
+fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
 #fslmaths full_latest/mean_ftiss $scale_uncorr perfusion_gm_mask
 
@@ -218,14 +227,14 @@ echo "Estimate CBF with PV correction on perfusion map..."
 cd $mbased_fabber_LR_after
 
 # Estimate CBF
-fabber --data=$out_dir/$itc_file --data-order=singlefile --mask=$out_dir/$mask --output=full -@ $out_dir/options_fabber.txt
+fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
 # PV correction on perfusion map
 asl_pv_lr --data=full_latest/mean_ftiss --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
 
 calibrate=" -div 1 -div 0.91 "
 # Calibrate using M0a_gm and apply GM mask
-fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas gm_mask perfusion_gm_mask
+fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
@@ -241,7 +250,7 @@ echo "Estimate CBF without PV correction..."
 
 cd $mbased_basil_uncorr
 
-basil -i $out_dir/$it_file -m $out_dir/$mask -o full -@ $out_dir/options_basil.txt
+basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 
 cd $out_dir
 
@@ -261,7 +270,7 @@ echo "Estimate CBF with PV correction on perfusion map..."
 cd $mbased_basil_LR_after
 
 # Estimate CBF
-basil -i $out_dir/$it_file -m $out_dir/$mask -o full -@ $out_dir/options_basil.txt
+basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 
 # PV correction on perfusion map
 
@@ -279,7 +288,7 @@ echo "Estimate CBF without PV correction..."
 cd $mfree_uncorr
 
 # Edit T1 value (which is not 1.6)
-asl_mfree --data=$out_dir/$it_file --mask=$out_dir/$mask --aif=$out_dir/$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
+asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
 
 cd $out_dir
 
@@ -300,7 +309,7 @@ cd $mfree_LR_after
 
 # Estimate CBF
 # Edit T1 value (which is not 1.6)
-asl_mfree --data=$out_dir/$it_file --mask=$out_dir/$mask --aif=$out_dir/$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
+asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
 
 # PV correction on perfusion map
 
