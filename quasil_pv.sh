@@ -221,7 +221,11 @@ cd $mbased_fabber_LR_after
 fabber --data=$out_dir/$itc_file --data-order=singlefile --mask=$out_dir/$mask --output=full -@ $out_dir/options_fabber.txt
 
 # PV correction on perfusion map
+asl_pv_lr --data=full_latest/mean_ftiss --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
 
+calibrate=" -div 1 -div 0.91 "
+# Calibrate using M0a_gm and apply GM mask
+fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas gm_mask perfusion_gm_mask
 
 cd $out_dir
 
