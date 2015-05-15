@@ -336,7 +336,7 @@ done
 fslmerge -t $corr_t_gm_file $file_list
 
 # Estimate CBF
-fabber --data=$corr_t_gm_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
+basil -i $corr_t_gm_file -m $mask -o full -@ $out_dir/options_basil.txt
 
 # Calibrate
 fslmaths full/step1/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
