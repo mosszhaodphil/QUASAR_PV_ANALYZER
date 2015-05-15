@@ -192,8 +192,8 @@ aif_ti_file_base="aif_pv_ti_"
 asl_file --data=$it_file --ntis=$ntis_t --split=$aif_ti_file_base
 
 # Split Tissue
-tissue_ti_file_base="t_pv_ti_"
-asl_file --data=$iaif_file --ntis=$ntis_t --split=tissue_ti_file_base
+#tissue_ti_file_base="t_pv_ti_"
+#asl_file --data=$iaif_file --ntis=$ntis_t --split=tissue_ti_file_base
 
 # Split TC difference
 #tc_ti_file_base="tc_pv_ti_"
@@ -232,7 +232,7 @@ corr_tc_gm_file="tc_pv_gm"
 
 # Split TC difference
 tc_ti_file_base="tc_pv_ti_"
-asl_file --data=$itc_file --ntis=$ntis_tc --split=tc_ti_file_base
+asl_file --data=$itc_file --ntis=$ntis_tc --split=$tc_ti_file_base
 
 file_list=""
 
@@ -241,7 +241,7 @@ for ((i = 0; i < $ntis_tc; i++)); do
     # Zero pad values: 000, 001, 002, ...
     zero_pad_value=$(printf "%03d" $i)
 
-    uncorr_file=tc_ti_file_base"$zero_pad_value"
+    uncorr_file="$tc_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
     asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
@@ -262,8 +262,6 @@ fabber --data=$corr_tc_gm_file --data-order=singlefile --mask=$mask --output=ful
 fslmaths full_latest/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
-
-exit 1
 
 
 # LR PV correction on perfusion map
@@ -309,6 +307,39 @@ echo "Estimate CBF with PV correction on ASL data..."
 
 cd $mbased_basil_LR_before
 
+corr_t_gm_file="t_pv_gm"
+
+# Split Tissue
+tissue_ti_file_base="t_pv_ti_"
+asl_file --data=$iaif_file --ntis=$ntis_t --split=$tissue_ti_file_base
+
+
+file_list=""
+
+# PV correction on each TI
+for ((i = 0; i < $ntis_t; i++)); do
+    # Zero pad values: 000, 001, 002, ...
+    zero_pad_value=$(printf "%03d" $i)
+
+    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
+
+    # LR PV correction on single TI data
+    asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+
+    corr_file_gm=$uncorr_file"_gm"
+
+    # Add the corrected file to file list for merging
+    file_list=$file_list" $corr_file_gm"
+done
+
+# Merge the corrected files
+fslmerge -t $corr_t_gm_file $file_list
+
+# Estimate CBF
+fabber --data=$corr_t_gm_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
+
+# Calibrate
+fslmaths full/step1/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
@@ -329,6 +360,8 @@ fslmaths full/step1/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_g
 
 cd $out_dir
 
+
+exit 1
 
 # Model-free analysis
 echo ""
