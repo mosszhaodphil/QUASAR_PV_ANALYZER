@@ -188,13 +188,19 @@ mkdir $mfree_LR_after
 cd $out_dir
 
 # Split AIF
-asl_file --data=$it_file --ntis=$ntis_t --split=aif_ti_
+aif_ti_file_base="=aif_pv_ti_"
+asl_file --data=$it_file --ntis=$ntis_t --split=$aif_ti_file_base
 
 # Split Tissue
-asl_file --data=$iaif_file --ntis=$ntis_t --split=tissue_ti_
+tissue_ti_file_base="t_pv_ti_"
+asl_file --data=$iaif_file --ntis=$ntis_t --split=tissue_ti_file_base
 
 # Split TC difference
-asl_file --data=$itc_file --ntis=$ntis_tc --split=tc_ti_
+#tc_ti_file_base="tc_pv_ti_"
+#asl_file --data=$itc_file --ntis=$ntis_tc --split=tc_ti_file_base
+
+# Calibration
+calibrate=" -div 1 -div 0.91 "
 
 # Start CBF estimation
 # Model-based analysis in FABBER
@@ -209,9 +215,27 @@ cd $mbased_fabber_uncorr
 
 fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
-#fslmaths full_latest/mean_ftiss $scale_uncorr perfusion_gm_mask
+calibrate=" -div 1 -div 0.91 "
+# Calibrate using M0a_gm and apply GM mask
+fslmaths full_latest/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
+
+exit 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # LR PV correction on ASL data
 echo ""
@@ -219,8 +243,41 @@ echo "Estimate CBF with PV correction on ASL data..."
 
 cd $mbased_fabber_LR_before
 
+corr_tc_gm_file="tc_pv_gm"
+
+# Split TC difference
+tc_ti_file_base="tc_pv_ti_"
+asl_file --data=$itc_file --ntis=$ntis_tc --split=tc_ti_file_base
+
+file_list=""
+
+# PV correction on each TI
+for ((i = 0; i < $ntis_tc; i++)); do
+    # Zero pad values: 000, 001, 002, ...
+    zero_pad_value=$(printf "%03d" $i)
+
+    uncorr_file=tc_ti_file_base"$zero_pad_value"
+
+    # LR PV correction on single TI data
+    asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+
+    corr_file_gm=$uncorr_file"_gm"
+
+    # Add the corrected file to file list for merging
+    file_list=$file_list" $corr_file_gm"
+done
+
+# Merge the corrected files
+fslmerge -t $corr_tc_gm_file $file_list
+
+# Estimate CBF
+fabber --data=$corr_tc_gm_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
+
+# Calibrate
+fslmaths full_latest/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
+
 
 # LR PV correction on perfusion map
 echo ""
@@ -234,7 +291,6 @@ fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $o
 # PV correction on perfusion map
 asl_pv_lr --data=full_latest/mean_ftiss --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
 
-calibrate=" -div 1 -div 0.91 "
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full_latest/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
@@ -252,7 +308,11 @@ echo "Estimate CBF without PV correction..."
 
 cd $mbased_basil_uncorr
 
+# Estimate CBF
 basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
+
+# Calibrate using M0a_gm and apply GM mask
+fslmaths full/step1/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
@@ -277,7 +337,6 @@ basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 # PV correction on perfusion map
 asl_pv_lr --data=full/step1/mean_ftiss --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
 
-calibrate=" -div 1 -div 0.91 "
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full/step1/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
@@ -294,8 +353,12 @@ echo "Estimate CBF without PV correction..."
 
 cd $mfree_uncorr
 
+# Estimate CBF
 # Edit T1 value (which is not 1.6)
-asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
+asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=0.68 --out=full --fa=$FA
+
+# Calibrate using M0a_gm and apply GM mask
+fslmaths full_magntiude $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
@@ -321,7 +384,6 @@ asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=
 # PV correction on perfusion map
 asl_pv_lr --data=full_magntiude --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
 
-calibrate=" -div 1 -div 0.91 "
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full_magntiude_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
