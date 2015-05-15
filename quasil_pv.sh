@@ -188,7 +188,7 @@ mkdir $mfree_LR_after
 cd $out_dir
 
 # Split AIF
-aif_ti_file_base="=aif_pv_ti_"
+aif_ti_file_base="aif_pv_ti_"
 asl_file --data=$it_file --ntis=$ntis_t --split=$aif_ti_file_base
 
 # Split Tissue
@@ -220,21 +220,6 @@ calibrate=" -div 1 -div 0.91 "
 fslmaths full_latest/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
-
-exit 1
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # LR PV correction on ASL data
@@ -277,6 +262,8 @@ fabber --data=$corr_tc_gm_file --data-order=singlefile --mask=$mask --output=ful
 fslmaths full_latest/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
+
+exit 1
 
 
 # LR PV correction on perfusion map
