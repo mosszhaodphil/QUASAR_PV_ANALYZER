@@ -182,7 +182,7 @@ fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $o
 
 calibrate=" -div 1 -div 0.91 "
 # Calibrate using M0a_gm and apply GM mask
-fslmaths full_latest/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+fslmaths full_latest/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
@@ -242,7 +242,7 @@ fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $o
 asl_pv_lr --data=full_latest/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
 
 # Calibrate using M0a_gm and apply GM mask
-fslmaths full_latest/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
@@ -321,7 +321,7 @@ basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 asl_pv_lr --data=full/step1/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
 
 # Calibrate using M0a_gm and apply GM mask
-fslmaths full/step1/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
 
 cd $out_dir
 
