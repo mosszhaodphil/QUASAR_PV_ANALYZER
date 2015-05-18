@@ -164,18 +164,6 @@ mkdir $mfree_LR_after
 # Split files for LR PV correction
 cd $out_dir
 
-# Split AIF
-#aif_ti_file_base="aif_pv_ti_"
-#asl_file --data=$it_file --ntis=$ntis_t --split=$aif_ti_file_base
-
-# Split Tissue
-#tissue_ti_file_base="t_pv_ti_"
-#asl_file --data=$iaif_file --ntis=$ntis_t --split=tissue_ti_file_base
-
-# Split TC difference
-#tc_ti_file_base="tc_pv_ti_"
-#asl_file --data=$itc_file --ntis=$ntis_tc --split=tc_ti_file_base
-
 # Calibration
 calibrate=" -div 1 -div 0.91 "
 
@@ -221,7 +209,7 @@ for ((i = 0; i < $ntis_tc; i++)); do
     uncorr_file="$tc_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
     corr_file_gm=$uncorr_file"_gm"
 
@@ -251,7 +239,7 @@ cd $mbased_fabber_LR_after
 fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
 # PV correction on perfusion map
-asl_pv_lr --data=full_latest/mean_ftiss --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+asl_pv_lr --data=full_latest/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full_latest/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
@@ -301,7 +289,7 @@ for ((i = 0; i < $ntis_t; i++)); do
     uncorr_file="$tissue_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
     corr_file_gm=$uncorr_file"_gm"
 
@@ -330,7 +318,7 @@ cd $mbased_basil_LR_after
 basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 
 # PV correction on perfusion map
-asl_pv_lr --data=full/step1/mean_ftiss --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+asl_pv_lr --data=full/step1/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full/step1/mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
@@ -379,7 +367,7 @@ for ((i = 0; i < $ntis_t; i++)); do
     uncorr_file="$aif_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
     corr_file_gm=$uncorr_file"_gm"
 
@@ -409,7 +397,7 @@ for ((i = 0; i < $ntis_t; i++)); do
     uncorr_file="$tissue_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
     corr_file_gm=$uncorr_file"_gm"
 
@@ -441,7 +429,7 @@ cd $mfree_LR_after
 asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
 
 # PV correction on perfusion map
-asl_pv_lr --data=full_magntiude --pvgm=$pvgm --pvwm=$pvwm --mask=$mask --out=not_used --kernel=$kernel
+asl_pv_lr --data=full_magntiude --pv=$pvgm --mask=$mask --out=full_magntiude_gm --kernel=$kernel
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full_magntiude_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
