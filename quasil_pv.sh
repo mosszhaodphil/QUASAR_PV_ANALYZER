@@ -220,7 +220,7 @@ corr_tc_gm_file="tc_pv_gm"
 # Merge the corrected files
 #fslmerge -t $corr_tc_gm_file $file_list
 
-asl_file --data=$itc_file --ntis=$ntis_tc --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_tc_gm_file
+asl_file --data=$itc_file --ntis=$ntis_tc --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_tc_gm_file
 
 # Estimate CBF
 fabber --data=$corr_tc_gm_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
@@ -243,7 +243,7 @@ fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $o
 # PV correction on perfusion map
 #asl_pv_lr --data=full_latest/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
 
-asl_file --data=full_latest/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=mean_ftiss_gm
+asl_file --data=full_latest/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=mean_ftiss_gm
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
@@ -304,7 +304,7 @@ corr_t_gm_file="tissue_pv_gm"
 # Merge the corrected files
 #fslmerge -t $corr_t_gm_file $file_list
 
-asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_t_gm_file
+asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_t_gm_file
 
 # Estimate CBF
 basil -i $corr_t_gm_file -m $mask -o full -@ $out_dir/options_basil.txt
@@ -326,7 +326,7 @@ basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 # PV correction on perfusion map
 #asl_pv_lr --data=full/step1/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
 
-asl_file --data=full/step1/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=mean_ftiss_gm
+asl_file --data=full/step1/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=mean_ftiss_gm
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
@@ -386,7 +386,7 @@ corr_aif_gm_file="aif_pv_gm"
 # Merge the corrected files
 #fslmerge -t $corr_aif_gm_file $file_list
 
-asl_file --data=$iaif_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_aif_gm_file
+asl_file --data=$iaif_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_aif_gm_file
 
 
 corr_t_gm_file="tissue_pv_gm"
@@ -416,7 +416,7 @@ corr_t_gm_file="tissue_pv_gm"
 # Merge the corrected files
 #fslmerge -t $corr_t_gm_file $file_list
 
-asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_t_gm_file
+asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_t_gm_file
 
 # Estimate CBF
 # Edit T1 value (which is not 1.6)
@@ -441,7 +441,7 @@ asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=
 # PV correction on perfusion map
 #asl_pv_lr --data=full_magntiude --pv=$pvgm --mask=$mask --out=full_magntiude_gm --kernel=$kernel
 
-asl_file --data=full_magntiude --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=full_magntiude_gm
+asl_file --data=full_magntiude --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=full_magntiude_gm
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full_magntiude_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
