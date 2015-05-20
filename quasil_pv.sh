@@ -196,29 +196,31 @@ cd $mbased_fabber_LR_before
 corr_tc_gm_file="tc_pv_gm"
 
 # Split TC difference
-tc_ti_file_base="tc_pv_ti_"
-asl_file --data=$itc_file --ntis=$ntis_tc --split=$tc_ti_file_base
+#tc_ti_file_base="tc_pv_ti_"
+#asl_file --data=$itc_file --ntis=$ntis_tc --split=$tc_ti_file_base
 
-file_list=""
+#file_list=""
 
 # PV correction on each TI
-for ((i = 0; i < $ntis_tc; i++)); do
+#for ((i = 0; i < $ntis_tc; i++)); do
     # Zero pad values: 000, 001, 002, ...
-    zero_pad_value=$(printf "%03d" $i)
+#    zero_pad_value=$(printf "%03d" $i)
 
-    uncorr_file="$tc_ti_file_base""$zero_pad_value"
+#    uncorr_file="$tc_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
+#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
-    corr_file_gm=$uncorr_file"_gm"
+#    corr_file_gm=$uncorr_file"_gm"
 
     # Add the corrected file to file list for merging
-    file_list=$file_list" $corr_file_gm"
-done
+#    file_list=$file_list" $corr_file_gm"
+#done
 
 # Merge the corrected files
-fslmerge -t $corr_tc_gm_file $file_list
+#fslmerge -t $corr_tc_gm_file $file_list
+
+asl_file --data=$itc_file --ntis=$ntis_tc --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_tc_gm_file
 
 # Estimate CBF
 fabber --data=$corr_tc_gm_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
@@ -239,7 +241,9 @@ cd $mbased_fabber_LR_after
 fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
 # PV correction on perfusion map
-asl_pv_lr --data=full_latest/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
+#asl_pv_lr --data=full_latest/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
+
+asl_file --data=full_latest/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=mean_ftiss_gm
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
@@ -275,30 +279,32 @@ cd $mbased_basil_LR_before
 corr_t_gm_file="tissue_pv_gm"
 
 # Split Tissue
-tissue_ti_file_base="tissue_pv_ti_"
-asl_file --data=$it_file --ntis=$ntis_t --split=$tissue_ti_file_base
+#tissue_ti_file_base="tissue_pv_ti_"
+#asl_file --data=$it_file --ntis=$ntis_t --split=$tissue_ti_file_base
 
 
-file_list=""
+#file_list=""
 
 # PV correction on each TI
-for ((i = 0; i < $ntis_t; i++)); do
+#for ((i = 0; i < $ntis_t; i++)); do
     # Zero pad values: 000, 001, 002, ...
-    zero_pad_value=$(printf "%03d" $i)
+#    zero_pad_value=$(printf "%03d" $i)
 
-    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
+#    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
+#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
-    corr_file_gm=$uncorr_file"_gm"
+#    corr_file_gm=$uncorr_file"_gm"
 
     # Add the corrected file to file list for merging
-    file_list=$file_list" $corr_file_gm"
-done
+#    file_list=$file_list" $corr_file_gm"
+#done
 
 # Merge the corrected files
-fslmerge -t $corr_t_gm_file $file_list
+#fslmerge -t $corr_t_gm_file $file_list
+
+asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_t_gm_file
 
 # Estimate CBF
 basil -i $corr_t_gm_file -m $mask -o full -@ $out_dir/options_basil.txt
@@ -318,7 +324,9 @@ cd $mbased_basil_LR_after
 basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 
 # PV correction on perfusion map
-asl_pv_lr --data=full/step1/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
+#asl_pv_lr --data=full/step1/mean_ftiss --pv=$pvgm --mask=$mask --out=mean_ftiss_gm --kernel=$kernel
+
+asl_file --data=full/step1/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=mean_ftiss_gm
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
@@ -354,59 +362,61 @@ cd $mfree_LR_before
 corr_aif_gm_file="aif_pv_gm"
 
 # Split AIF
-aif_ti_file_base="aif_pv_ti_"
-asl_file --data=$iaif_file --ntis=$ntis_t --split=$aif_ti_file_base
+#aif_ti_file_base="aif_pv_ti_"
+#asl_file --data=$iaif_file --ntis=$ntis_t --split=$aif_ti_file_base
 
-file_list=""
+#file_list=""
 
 # PV correction on each TI
-for ((i = 0; i < $ntis_t; i++)); do
+#for ((i = 0; i < $ntis_t; i++)); do
     # Zero pad values: 000, 001, 002, ...
-    zero_pad_value=$(printf "%03d" $i)
+#    zero_pad_value=$(printf "%03d" $i)
 
-    uncorr_file="$aif_ti_file_base""$zero_pad_value"
+#    uncorr_file="$aif_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
+#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
-    corr_file_gm=$uncorr_file"_gm"
+#    corr_file_gm=$uncorr_file"_gm"
 
     # Add the corrected file to file list for merging
-    file_list=$file_list" $corr_file_gm"
-done
+#    file_list=$file_list" $corr_file_gm"
+#done
 
 # Merge the corrected files
-fslmerge -t $corr_aif_gm_file $file_list
+#fslmerge -t $corr_aif_gm_file $file_list
 
-
+asl_file --data=$iaif_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_aif_gm_file
 
 
 corr_t_gm_file="tissue_pv_gm"
 
 # Split Tissue
-tissue_ti_file_base="tissue_pv_ti_"
-asl_file --data=$it_file --ntis=$ntis_t --split=$tissue_ti_file_base
+#tissue_ti_file_base="tissue_pv_ti_"
+#asl_file --data=$it_file --ntis=$ntis_t --split=$tissue_ti_file_base
 
-file_list=""
+#file_list=""
 
 # PV correction on each TI
-for ((i = 0; i < $ntis_t; i++)); do
+#for ((i = 0; i < $ntis_t; i++)); do
     # Zero pad values: 000, 001, 002, ...
-    zero_pad_value=$(printf "%03d" $i)
+#    zero_pad_value=$(printf "%03d" $i)
 
-    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
+#    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
 
     # LR PV correction on single TI data
-    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
+#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
 
-    corr_file_gm=$uncorr_file"_gm"
+#    corr_file_gm=$uncorr_file"_gm"
 
     # Add the corrected file to file list for merging
-    file_list=$file_list" $corr_file_gm"
-done
+#    file_list=$file_list" $corr_file_gm"
+#done
 
 # Merge the corrected files
-fslmerge -t $corr_t_gm_file $file_list
+#fslmerge -t $corr_t_gm_file $file_list
+
+asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=$corr_t_gm_file
 
 # Estimate CBF
 # Edit T1 value (which is not 1.6)
@@ -429,7 +439,9 @@ cd $mfree_LR_after
 asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
 
 # PV correction on perfusion map
-asl_pv_lr --data=full_magntiude --pv=$pvgm --mask=$mask --out=full_magntiude_gm --kernel=$kernel
+#asl_pv_lr --data=full_magntiude --pv=$pvgm --mask=$mask --out=full_magntiude_gm --kernel=$kernel
+
+asl_file --data=full_magntiude --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --pvout=full_magntiude_gm
 
 # Calibrate using M0a_gm and apply GM mask
 fslmaths full_magntiude_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
