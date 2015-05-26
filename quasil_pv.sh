@@ -1,5 +1,6 @@
 #!/bin/sh
-
+# command
+# sh quasil_pv.sh -it tissue_pv -itc tc_pv -iaif aif_pv -o output -m pvmask_z3 -pvgm pvgm_z3 -pvwm pvwm_z3
 
 # deal with options
 
@@ -165,7 +166,7 @@ mkdir $mfree_LR_after
 cd $out_dir
 
 # Calibration
-calibrate=" -div 1 -div 0.91 "
+calibrate_gm=" -div 1 -div 0.91 -mul 6000 -mas $gm_mask"
 
 # Start CBF estimation
 # Model-based analysis in FABBER
@@ -180,9 +181,8 @@ cd $mbased_fabber_uncorr
 
 fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
-calibrate=" -div 1 -div 0.91 "
-# Calibrate using M0a_gm and apply GM mask
-fslmaths full_latest/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths full_latest/mean_ftiss $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -225,8 +225,8 @@ asl_file --data=$itc_file --ntis=$ntis_tc --pvmap=$pvgm --mask=$mask --kernel=$k
 # Estimate CBF
 fabber --data=$corr_tc_gm_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber.txt
 
-# Calibrate
-fslmaths full_latest/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm
+fslmaths full_latest/mean_ftiss $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -245,8 +245,8 @@ fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $o
 
 asl_file --data=full_latest/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=mean_ftiss_gm
 
-# Calibrate using M0a_gm and apply GM mask
-fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths mean_ftiss_gm $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -265,8 +265,8 @@ cd $mbased_basil_uncorr
 # Estimate CBF
 basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 
-# Calibrate using M0a_gm and apply GM mask
-fslmaths full/step1/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths full/step1/mean_ftiss $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -309,8 +309,8 @@ asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$ker
 # Estimate CBF
 basil -i $corr_t_gm_file -m $mask -o full -@ $out_dir/options_basil.txt
 
-# Calibrate
-fslmaths full/step1/mean_ftiss $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm
+fslmaths full/step1/mean_ftiss $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -328,8 +328,8 @@ basil -i $it_file -m $mask -o full -@ $out_dir/options_basil.txt
 
 asl_file --data=full/step1/mean_ftiss --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=mean_ftiss_gm
 
-# Calibrate using M0a_gm and apply GM mask
-fslmaths mean_ftiss_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths mean_ftiss_gm $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -348,8 +348,8 @@ cd $mfree_uncorr
 # Edit T1 value (which is not 1.6)
 asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=0.68 --out=full --fa=$FA
 
-# Calibrate using M0a_gm and apply GM mask
-fslmaths full_magntiude $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths full_magntiude $calibrate_gm perfusion_gm_mask
 
 cd $out_dir
 
@@ -422,8 +422,8 @@ asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$ker
 # Edit T1 value (which is not 1.6)
 asl_mfree --data=$corr_t_gm_file --mask=$mask --aif=$corr_aif_gm_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
 
-# Calibrate using M0a_gm and apply GM mask
-fslmaths full_magntiude $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths full_magntiude $calibrate_gm perfusion_gm_mask
 
 
 cd $out_dir
@@ -443,8 +443,8 @@ asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=
 
 asl_file --data=full_magntiude --ntis=1 --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=full_magntiude_gm
 
-# Calibrate using M0a_gm and apply GM mask
-fslmaths full_magntiude_gm $calibrate -mul 6000 -mas $gm_mask perfusion_gm_mask
+# calibrate_gm using M0a_gm and apply GM mask
+fslmaths full_magntiude_gm $calibrate_gm perfusion_gm_mask
 
 
 cd $out_dir
