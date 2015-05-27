@@ -1,0 +1,54 @@
+#QUASAR analysis options
+--mask=pvmask_z3
+--method=spatialvb
+--noise=white
+--model=quasar
+--inferart
+--repeats=1
+--disp=none
+--ti1=0.04 --ti2=0.34 --ti3=0.64 --ti4=0.94 --ti5=1.24 --ti6=1.54 --ti7=1.84 --ti8=2.14 --ti9=2.44 --ti10=2.74 --ti11=3.04 --ti12=3.34 --ti13=3.64
+--t1=1.3
+--t1b=1.6
+--t1wm=1.1
+--tau=0.64
+--fa=35.8
+#--slicedt=0.035
+#--infert1 
+--artdir
+--save-model-fit
+--print-free-energy
+#--usecalib 
+#--image-prior5=calib_latest/T1t 
+--inferwm 
+--usepve 
+--max-iterations=200
+#--image-prior9=calib_latest/T1t 
+--image-prior7=pvgm_z3 
+--image-prior8=pvwm_z3 
+#--image-prior17=calib_latest/g
+--param-spatial-priors=N+
+
+--PSP_byname1=ftiss 
+
+
+--PSP_byname1_type=M
+
+#CBF
+#arrival time tissue
+#ABV
+#arterial arrival time
+
+
+--PSP_byname${spriors}=ftiss 
+--PSP_byname1=ftiss
+
+--PSP_byname${sporiors}=$stype
+--PSP_byname$1_type=MNI
+--PSP_byname${spriors}_image=$pgm
+--PSP_byname1_image=<Image path>
+
+--PSP_byname${spriors}=ftiss 
+
+--PSP_byname${sporiors}=$stype
+
+#image paths

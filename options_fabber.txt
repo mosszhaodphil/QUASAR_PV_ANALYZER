@@ -1,0 +1,23 @@
+#QUASAR analysis options
+#--mask=mask
+#--method=spatialvb
+--method=vb
+--noise=white
+--model=quasar
+# quasar model incorporates dispersion by default, so we need to turn it off.
+--disp=none
+--inferart
+# save the model fit result
+--save-model-fit
+# print free energy
+--print-free-energy
+--repeats=1
+--ti1=0.04 --ti2=0.34 --ti3=0.64 --ti4=0.94 --ti5=1.24 --ti6=1.54 --ti7=1.84 --ti8=2.14 --ti9=2.44 --ti10=2.74 --ti11=3.04 --ti12=3.34 --ti13=3.64
+--t1=1.3 --t1b=1.6 --tau=0.64 --fa=35.80 
+#--slicedt=0.035
+#--infert1 
+--artdir
+--usecalib 
+#--image-prior5=T1t 
+#--image-prior11=g
+#--param-spatial-priors=MNANINNNNNI

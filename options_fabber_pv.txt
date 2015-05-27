@@ -1,0 +1,42 @@
+#QUASAR analysis options
+--method=spatialvb
+--noise=white
+--model=quasar
+--inferart
+--repeats=1
+--disp=none
+--ti1=0.04 --ti2=0.34 --ti3=0.64 --ti4=0.94 --ti5=1.24 --ti6=1.54 --ti7=1.84 --ti8=2.14 --ti9=2.44 --ti10=2.74 --ti11=3.04 --ti12=3.34 --ti13=3.64
+--t1=1.3
+--t1b=1.6
+--t1wm=1.1
+--tau=0.64
+--fa=35.8
+#--slicedt=0.035
+#--infert1 
+--artdir
+--save-model-fit
+--print-free-energy
+#--usecalib 
+#--image-prior5=calib_latest/T1t 
+--inferwm 
+--usepve 
+--max-iterations=200
+#--image-prior9=calib_latest/T1t 
+--image-prior7=../pvgm 
+--image-prior8=../pvwm 
+#--image-prior17=calib_latest/g
+--param-spatial-priors=MNANMNIINNNNN
+# Parameter order:
+# 1 CBF GM
+# 2 Arrival time to tissue GM
+# 3 ABV
+# 4 Arrival time to arterial blood
+# 5 CBF WM
+# 6 Arrival time to tissue WM
+# 7 PVGM
+# 8 PVWM
+# 9 Disp 1
+# 10 Disp 2
+# 11 Arterial component direction 1
+# 12 Arterial component direction 2
+# 13 Arterial component direction 3
