@@ -84,11 +84,15 @@ if [ -z $kernel ]; then
 fi
 
 if [ -z $FA ]; then
-	FA=35;
+	FA=35.8;
 fi
 
 if [ -z $tau ]; then
 	tau=0.64;
+fi
+
+if [ -z $t1 ]; then
+    t1=0.68;
 fi
 
 # Start program timer
@@ -206,31 +210,6 @@ cd $mbased_fabber_LR_before
 
 corr_tc_gm_file="tc_pv_gm"
 
-# Split TC difference
-#tc_ti_file_base="tc_pv_ti_"
-#asl_file --data=$itc_file --ntis=$ntis_tc --split=$tc_ti_file_base
-
-#file_list=""
-
-# PV correction on each TI
-#for ((i = 0; i < $ntis_tc; i++)); do
-    # Zero pad values: 000, 001, 002, ...
-#    zero_pad_value=$(printf "%03d" $i)
-
-#    uncorr_file="$tc_ti_file_base""$zero_pad_value"
-
-    # LR PV correction on single TI data
-#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
-
-#    corr_file_gm=$uncorr_file"_gm"
-
-    # Add the corrected file to file list for merging
-#    file_list=$file_list" $corr_file_gm"
-#done
-
-# Merge the corrected files
-#fslmerge -t $corr_tc_gm_file $file_list
-
 asl_file --data=$itc_file --ntis=$ntis_tc --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_tc_gm_file
 
 # Estimate CBF
@@ -289,32 +268,6 @@ cd $mbased_basil_LR_before
 
 corr_t_gm_file="tissue_pv_gm"
 
-# Split Tissue
-#tissue_ti_file_base="tissue_pv_ti_"
-#asl_file --data=$it_file --ntis=$ntis_t --split=$tissue_ti_file_base
-
-
-#file_list=""
-
-# PV correction on each TI
-#for ((i = 0; i < $ntis_t; i++)); do
-    # Zero pad values: 000, 001, 002, ...
-#    zero_pad_value=$(printf "%03d" $i)
-
-#    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
-
-    # LR PV correction on single TI data
-#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
-
-#    corr_file_gm=$uncorr_file"_gm"
-
-    # Add the corrected file to file list for merging
-#    file_list=$file_list" $corr_file_gm"
-#done
-
-# Merge the corrected files
-#fslmerge -t $corr_t_gm_file $file_list
-
 asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_t_gm_file
 
 # Estimate CBF
@@ -357,7 +310,7 @@ cd $mfree_uncorr
 
 # Estimate CBF
 # Edit T1 value (which is not 1.6)
-asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=0.68 --out=full --fa=$FA
+asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=$t1 --out=full --fa=$FA
 
 # calibrate_gm using M0a_gm and apply GM mask
 fslmaths full_magntiude $calibrate_gm perfusion_gm_mask
@@ -372,66 +325,16 @@ cd $mfree_LR_before
 
 corr_aif_gm_file="aif_pv_gm"
 
-# Split AIF
-#aif_ti_file_base="aif_pv_ti_"
-#asl_file --data=$iaif_file --ntis=$ntis_t --split=$aif_ti_file_base
-
-#file_list=""
-
-# PV correction on each TI
-#for ((i = 0; i < $ntis_t; i++)); do
-    # Zero pad values: 000, 001, 002, ...
-#    zero_pad_value=$(printf "%03d" $i)
-
-#    uncorr_file="$aif_ti_file_base""$zero_pad_value"
-
-    # LR PV correction on single TI data
-#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
-
-#    corr_file_gm=$uncorr_file"_gm"
-
-    # Add the corrected file to file list for merging
-#    file_list=$file_list" $corr_file_gm"
-#done
-
-# Merge the corrected files
-#fslmerge -t $corr_aif_gm_file $file_list
-
 asl_file --data=$iaif_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_aif_gm_file
 
 
 corr_t_gm_file="tissue_pv_gm"
 
-# Split Tissue
-#tissue_ti_file_base="tissue_pv_ti_"
-#asl_file --data=$it_file --ntis=$ntis_t --split=$tissue_ti_file_base
-
-#file_list=""
-
-# PV correction on each TI
-#for ((i = 0; i < $ntis_t; i++)); do
-    # Zero pad values: 000, 001, 002, ...
-#    zero_pad_value=$(printf "%03d" $i)
-
-#    uncorr_file="$tissue_ti_file_base""$zero_pad_value"
-
-    # LR PV correction on single TI data
-#    asl_pv_lr --data=$uncorr_file --pv=$pvgm --mask=$mask --out=$uncorr_file"_gm" --kernel=$kernel
-
-#    corr_file_gm=$uncorr_file"_gm"
-
-    # Add the corrected file to file list for merging
-#    file_list=$file_list" $corr_file_gm"
-#done
-
-# Merge the corrected files
-#fslmerge -t $corr_t_gm_file $file_list
-
 asl_file --data=$it_file --ntis=$ntis_t --pvmap=$pvgm --mask=$mask --kernel=$kernel --out=$corr_t_gm_file
 
 # Estimate CBF
 # Edit T1 value (which is not 1.6)
-asl_mfree --data=$corr_t_gm_file --mask=$mask --aif=$corr_aif_gm_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
+asl_mfree --data=$corr_t_gm_file --mask=$mask --aif=$corr_aif_gm_file --dt=0.3 --t1=$t1 --out=full --fa=$FA
 
 # calibrate_gm using M0a_gm and apply GM mask
 fslmaths full_magntiude $calibrate_gm perfusion_gm_mask
@@ -447,7 +350,7 @@ cd $mfree_LR_after
 
 # Estimate CBF
 # Edit T1 value (which is not 1.6)
-asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=1.6 --out=full --fa=$FA
+asl_mfree --data=$it_file --mask=$mask --aif=$iaif_file --dt=0.3 --t1=$t1 --out=full --fa=$FA
 
 # PV correction on perfusion map
 #asl_pv_lr --data=full_magntiude --pv=$pvgm --mask=$mask --out=full_magntiude_gm --kernel=$kernel
@@ -459,10 +362,6 @@ fslmaths full_magntiude_gm $calibrate_gm perfusion_gm_mask
 
 
 cd $out_dir
-
-
-
-
 
 
 # Spatial Variational Bayes (svb) PV correction on QUASAR ASL differnt data
