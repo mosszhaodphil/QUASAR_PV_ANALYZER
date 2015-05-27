@@ -1,6 +1,6 @@
 #!/bin/sh
 # command
-# sh quasil_pv.sh -it tissue_pv -itc tc_pv -iaif aif_pv -o output -m pvmask_z3 -pvgm pvgm_z3 -pvwm pvwm_z3
+# sh quasil_pv.sh -it tissue_pv -itc tc_pv -iaif aif_pv -o output -m mask -pvgm pvgm -pvwm pvwm
 
 # deal with options
 
