@@ -91,6 +91,9 @@ if [ -z $tau ]; then
 	tau=0.64;
 fi
 
+# Start program timer
+$start_timestamp=$SECONDS
+
 # Total number of TIs
 ntis_tc=78 # QUASAR sequence six phases
 ntis_t=13 # Tissue curve only
@@ -107,6 +110,9 @@ mbased_basil_LR_after="mbased_BASIL_LR_after"
 mfree_uncorr="mfree_uncorr"
 mfree_LR_before="mfree_LR_before"
 mfree_LR_after="mfree_LR_after"
+
+mbased_fabber_svb="mbased_FABBER_svb"
+mbased_basil_svb="mbased_BASIL_svb"
 
 # Starting directory (absolute path)
 start_dir=`pwd`
@@ -140,6 +146,8 @@ pvwm=$out_dir"/"$pvwm
 # Copy option files to output directory
 cp $start_dir/options_fabber.txt $out_dir/options_fabber.txt
 cp $start_dir/options_basil.txt $out_dir/options_basil.txt
+cp $start_dir/options_fabber_pv.txt $out_dir/options_fabber_pv.txt
+cp $start_dir/options_basil_pv.txt $out_dir/options_basil_pv.txt
 
 # Make GM WM masks
 gm_mask="gm_mask"
@@ -149,7 +157,7 @@ wm_mask=$out_dir"/"$wm_mask
 fslmaths $pvgm -bin $gm_mask
 fslmaths $pvwm -bin $wm_mask
 
-# Make six output directories
+# Make eight output directories
 mkdir $mbased_fabber_uncorr
 mkdir $mbased_fabber_LR_before
 mkdir $mbased_fabber_LR_after
@@ -161,6 +169,9 @@ mkdir $mbased_basil_LR_after
 mkdir $mfree_uncorr
 mkdir $mfree_LR_before
 mkdir $mfree_LR_after
+
+mkdir $mbased_fabber_svb
+mkdir $mbased_basil_svb
 
 # Split files for LR PV correction
 cd $out_dir
@@ -450,5 +461,47 @@ fslmaths full_magntiude_gm $calibrate_gm perfusion_gm_mask
 cd $out_dir
 
 
+
+
+
+
+# Spatial Variational Bayes (svb) PV correction on QUASAR ASL differnt data
+echo ""
+echo "Estimate CBF with PV correction on QUASAR ASL different data by Spatial Variational Bayes (SVB)..."
+
+cd $mbased_fabber_svb
+
+# Estimate CBF
+fabber --data=$itc_file --data-order=singlefile --mask=$mask --output=full -@ $out_dir/options_fabber_pv.txt
+
+# Calibration
+fslmaths full_latest/mean_ftiss $calibrate_gm perfusion_gm_mask
+
+cd $out_dir
+
+
+
+# Spatial Variational Bayes (svb) PV correction on QUASAR ASL differnt data
+echo ""
+echo "Estimate CBF with PV correction on QUASAR ASL tissue data by Spatial Variational Bayes (SVB)..."
+
+cd $mbased_basil_svb
+
+# Estimate CBF
+basil -i $it_file -o full -m $mask --pgm $pvgm --pwm $pvwm -@ $out_dir/options_basil_pv.txt
+
+# Calibration
+fslmaths full/step2/mean_ftiss $calibrate_gm perfusion_gm_mask
+
+cd $out_dir
+
 echo ""
 echo "All process completed!!"
+
+end_timestamp=$SECONDS
+
+echo "Duration: " $(((end_timestamp-start_timestamp)/60)) " minutes"
+
+
+
+
